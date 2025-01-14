@@ -5,6 +5,7 @@ from pydantic import BaseModel
 app = FastAPI()
 
 TABLE_HEADERS = ["id", "title", "director", "category", "year"]
+DATABASE = "movies.db"
 
 
 class Movie(BaseModel):
@@ -42,7 +43,7 @@ def convert_result(result):
 
 @app.get("/movies/all/", response_model=list[Movie], status_code=200)
 async def get_all_movies():
-    with sqlite3.connect("movies.db") as con:
+    with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute("SELECT rowid, title, director, category, year FROM movies")
         results = cur.fetchall()
@@ -53,7 +54,7 @@ async def get_all_movies():
 
 @app.get("/movies/{movie_id}", response_model=Movie, status_code=200)
 async def get_movie_by_id(movie_id: int):
-    with sqlite3.connect("movies.db") as con:
+    with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute(
             "SELECT rowid, title, director, category, year FROM movies WHERE rowid=?",
@@ -63,3 +64,13 @@ async def get_movie_by_id(movie_id: int):
 
     result = convert_result(result)
     return result
+
+
+@app.delete("/movies/del/{movie_id}", status_code=200)
+async def del_movie_by_id(movie_id: int):
+    with sqlite3.connect(DATABASE) as con:
+        cur = con.cursor()
+        cur.execute("DELETE FROM movies WHERE rowid=?", (movie_id,))
+        con.commit()
+
+    return {"message": "Movie deleted successfully"}
