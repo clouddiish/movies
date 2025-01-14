@@ -8,8 +8,15 @@ TABLE_HEADERS = ["id", "title", "director", "category", "year"]
 DATABASE = "movies.db"
 
 
-class Movie(BaseModel):
+class MovieOut(BaseModel):
     id: int
+    title: str
+    director: str
+    category: str
+    year: int
+
+
+class MovieIn(BaseModel):
     title: str
     director: str
     category: str
@@ -41,7 +48,7 @@ def convert_result(result):
     return result_dict
 
 
-@app.get("/movies/all/", response_model=list[Movie], status_code=200)
+@app.get("/movies/all/", response_model=list[MovieOut], status_code=200)
 async def get_all_movies():
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
@@ -52,7 +59,7 @@ async def get_all_movies():
     return results
 
 
-@app.get("/movies/{movie_id}", response_model=Movie, status_code=200)
+@app.get("/movies/{movie_id}/", response_model=MovieOut, status_code=200)
 async def get_movie_by_id(movie_id: int):
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
@@ -66,7 +73,47 @@ async def get_movie_by_id(movie_id: int):
     return result
 
 
-@app.delete("/movies/del/{movie_id}", status_code=200)
+@app.post("/movies/add/", status_code=201)
+async def add_movie(new_movie: MovieIn):
+    with sqlite3.connect(DATABASE) as con:
+        cur = con.cursor()
+        cur.execute(
+            "INSERT INTO movies VALUES(?, ?, ?, ?)",
+            (new_movie.title, new_movie.director, new_movie.category, new_movie.year),
+        )
+        con.commit()
+
+    return {"message": "Movie added successfully"}
+
+
+@app.put("/movies/edit/{movie_id}/", status_code=200)
+async def update_movie_by_id(movie_id: int, new_movie: MovieIn):
+    with sqlite3.connect(DATABASE) as con:
+        cur = con.cursor()
+        cur.execute(
+            """
+                UPDATE movies 
+                SET title = ?,
+                    director = ?,
+                    category = ?,
+                    year = ?
+                WHERE
+                    rowid = ?
+            """,
+            (
+                new_movie.title,
+                new_movie.director,
+                new_movie.category,
+                new_movie.year,
+                movie_id,
+            ),
+        )
+        con.commit()
+
+    return {"message": "Movie updated successfully"}
+
+
+@app.delete("/movies/del/{movie_id}/", status_code=200)
 async def del_movie_by_id(movie_id: int):
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
