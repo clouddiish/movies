@@ -48,11 +48,34 @@ def convert_result(result):
     return result_dict
 
 
+def convert_to_set_of_ids(results):
+    results_set = set()
+
+    for tup in results:
+        results_set.add(tup[0])
+
+    return results_set
+
+
+def does_movie_with_id_exist(id):
+    with sqlite3.connect(DATABASE) as con:
+        cur = con.cursor()
+        cur.execute("SELECT id FROM movies")
+        results = cur.fetchall()
+
+    results = convert_to_set_of_ids(results)
+
+    if id in results:
+        return True
+
+    return False
+
+
 @app.get("/movies/all/", response_model=list[MovieOut], status_code=200)
 async def get_all_movies():
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
-        cur.execute("SELECT rowid, title, director, category, year FROM movies")
+        cur.execute("SELECT id, title, director, category, year FROM movies")
         results = cur.fetchall()
 
     results = convert_results(results)
@@ -64,7 +87,7 @@ async def get_movie_by_id(movie_id: int):
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute(
-            "SELECT rowid, title, director, category, year FROM movies WHERE rowid=?",
+            "SELECT id, title, director, category, year FROM movies WHERE id=?",
             (movie_id,),
         )
         result = cur.fetchone()
@@ -98,7 +121,7 @@ async def update_movie_by_id(movie_id: int, new_movie: MovieIn):
                     category = ?,
                     year = ?
                 WHERE
-                    rowid = ?
+                    id = ?
             """,
             (
                 new_movie.title,
@@ -117,7 +140,7 @@ async def update_movie_by_id(movie_id: int, new_movie: MovieIn):
 async def del_movie_by_id(movie_id: int):
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
-        cur.execute("DELETE FROM movies WHERE rowid=?", (movie_id,))
+        cur.execute("DELETE FROM movies WHERE id=?", (movie_id,))
         con.commit()
 
     return {"message": "Movie deleted successfully"}

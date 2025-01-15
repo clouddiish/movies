@@ -5,6 +5,7 @@ cur = con.cursor()
 
 cur.execute("DROP TABLE IF EXISTS movies")
 table = """CREATE TABLE movies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT, 
             director TEXT,
             category TEXT,
@@ -31,5 +32,8 @@ initial_data = [
     ("Golden Mirage", "Tommy Rivers", "adventure", 2003),
 ]
 
-cur.executemany("INSERT INTO movies VALUES(?, ?, ?, ?)", initial_data)
+cur.executemany(
+    "INSERT INTO movies (title, director, category, year) VALUES(?, ?, ?, ?)",
+    initial_data,
+)
 con.commit()
