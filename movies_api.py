@@ -50,30 +50,13 @@ def convert_result(result):
     return result_dict
 
 
-def convert_to_set_of_ids(results):
-    results_set = set()
-
-    for tup in results:
-        results_set.add(tup[0])
-
-    return results_set
-
-
-def get_set_of_existing_ids():
+def does_movie_with_id_exist(id):
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
-        cur.execute("SELECT id FROM movies")
-        results = cur.fetchall()
+        cur.execute("SELECT id FROM movies WHERE id=?", (id,))
+        results = cur.fetchone()
 
-    results = convert_to_set_of_ids(results)
-
-    return results
-
-
-def does_movie_with_id_exist(id):
-    results = get_set_of_existing_ids()
-
-    if id in results:
+    if results:
         return True
 
     return False
