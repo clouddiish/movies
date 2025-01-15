@@ -1,6 +1,8 @@
 import sqlite3
+from typing import Annotated
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 
 app = FastAPI()
 
@@ -8,19 +10,19 @@ TABLE_HEADERS = ["id", "title", "director", "category", "year"]
 DATABASE = "movies.db"
 
 
-class MovieOut(BaseModel):
+class MovieBase(BaseModel):
+    title: str = Field(min_length=1, description="The title cannot be empty")
+    director: str = Field(min_length=1, description="The director cannot be empty")
+    category: str = Field(min_length=1, description="The category cannot be empty")
+    year: int = Field(gt=0, description="The year must be a positive integer")
+
+
+class MovieOut(MovieBase):
     id: int
-    title: str
-    director: str
-    category: str
-    year: int
 
 
-class MovieIn(BaseModel):
-    title: str
-    director: str
-    category: str
-    year: int
+class MovieIn(MovieBase):
+    pass
 
 
 def convert_results(results):
@@ -78,7 +80,7 @@ def does_movie_with_id_exist(id):
 
 
 @app.get("/movies/all/", response_model=list[MovieOut], status_code=200)
-async def get_all_movies():
+def get_all_movies():
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute("SELECT id, title, director, category, year FROM movies")
@@ -89,7 +91,7 @@ async def get_all_movies():
 
 
 @app.get("/movies/{movie_id}/", response_model=MovieOut, status_code=200)
-async def get_movie_by_id(movie_id: int):
+def get_movie_by_id(movie_id: int):
     if not does_movie_with_id_exist(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
@@ -106,7 +108,7 @@ async def get_movie_by_id(movie_id: int):
 
 
 @app.post("/movies/add/", status_code=201)
-async def add_movie(new_movie: MovieIn):
+def add_movie(new_movie: MovieIn):
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute(
@@ -119,7 +121,7 @@ async def add_movie(new_movie: MovieIn):
 
 
 @app.put("/movies/edit/{movie_id}/", status_code=200)
-async def update_movie_by_id(movie_id: int, new_movie: MovieIn):
+def update_movie_by_id(movie_id: int, new_movie: MovieIn):
     if not does_movie_with_id_exist(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
@@ -149,7 +151,7 @@ async def update_movie_by_id(movie_id: int, new_movie: MovieIn):
 
 
 @app.delete("/movies/del/{movie_id}/", status_code=200)
-async def del_movie_by_id(movie_id: int):
+def del_movie_by_id(movie_id: int):
     if not does_movie_with_id_exist(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
