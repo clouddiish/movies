@@ -1,7 +1,6 @@
 import sqlite3
-from typing import Annotated
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from sqlmodel import SQLModel, Field, Session, create_engine, select,
 
 app = FastAPI()
 
@@ -9,7 +8,7 @@ TABLE_HEADERS = ["id", "title", "director", "category", "year"]
 DATABASE = "movies.db"
 
 
-class MovieBase(BaseModel):
+class MovieBase(SQLModel):
     """Base model for movie data.
 
     Attributes:
