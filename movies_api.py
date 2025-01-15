@@ -1,5 +1,5 @@
 import sqlite3
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -69,7 +69,7 @@ def get_set_of_existing_ids():
 
 
 def does_movie_with_id_exist(id):
-    results = get_set_of_existing_ids
+    results = get_set_of_existing_ids()
 
     if id in results:
         return True
@@ -90,6 +90,9 @@ async def get_all_movies():
 
 @app.get("/movies/{movie_id}/", response_model=MovieOut, status_code=200)
 async def get_movie_by_id(movie_id: int):
+    if not does_movie_with_id_exist(movie_id):
+        raise HTTPException(status_code=404, detail="Movie not found")
+
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute(
