@@ -6,10 +6,10 @@ cur = con.cursor()
 cur.execute("DROP TABLE IF EXISTS movies")
 table = """CREATE TABLE movies (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT, 
-            director TEXT,
-            category TEXT,
-            year INTEGER
+            title TEXT NOT NULL, 
+            director TEXT NOT NULL,
+            category TEXT NOT NULL,
+            year INTEGER NOT NULL
             )
         """
 cur.execute(table)
