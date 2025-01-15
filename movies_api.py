@@ -110,7 +110,7 @@ async def add_movie(new_movie: MovieIn):
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute(
-            "INSERT INTO movies VALUES(?, ?, ?, ?)",
+            "INSERT INTO movies (title, director, category, year) VALUES(?, ?, ?, ?)",
             (new_movie.title, new_movie.director, new_movie.category, new_movie.year),
         )
         con.commit()
