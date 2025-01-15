@@ -79,7 +79,7 @@ def does_movie_with_id_exist(id):
     return False
 
 
-@app.get("/movies/all/", response_model=list[MovieOut], status_code=200)
+@app.get("/movies", response_model=list[MovieOut], status_code=200)
 def get_all_movies():
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
@@ -90,7 +90,7 @@ def get_all_movies():
     return results
 
 
-@app.get("/movies/{movie_id}/", response_model=MovieOut, status_code=200)
+@app.get("/movies/{movie_id}", response_model=MovieOut, status_code=200)
 def get_movie_by_id(movie_id: int):
     if not does_movie_with_id_exist(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
@@ -107,7 +107,7 @@ def get_movie_by_id(movie_id: int):
     return result
 
 
-@app.post("/movies/add/", status_code=201)
+@app.post("/movies", status_code=201)
 def add_movie(new_movie: MovieIn):
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
@@ -120,7 +120,7 @@ def add_movie(new_movie: MovieIn):
     return {"message": "Movie added successfully"}
 
 
-@app.put("/movies/edit/{movie_id}/", status_code=200)
+@app.put("/movies/{movie_id}", status_code=200)
 def update_movie_by_id(movie_id: int, new_movie: MovieIn):
     if not does_movie_with_id_exist(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
@@ -150,7 +150,7 @@ def update_movie_by_id(movie_id: int, new_movie: MovieIn):
     return {"message": "Movie updated successfully"}
 
 
-@app.delete("/movies/del/{movie_id}/", status_code=200)
+@app.delete("/movies/{movie_id}", status_code=200)
 def del_movie_by_id(movie_id: int):
     if not does_movie_with_id_exist(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
