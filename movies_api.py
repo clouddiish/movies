@@ -120,6 +120,9 @@ async def add_movie(new_movie: MovieIn):
 
 @app.put("/movies/edit/{movie_id}/", status_code=200)
 async def update_movie_by_id(movie_id: int, new_movie: MovieIn):
+    if not does_movie_with_id_exist(movie_id):
+        raise HTTPException(status_code=404, detail="Movie not found")
+
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute(
@@ -147,6 +150,9 @@ async def update_movie_by_id(movie_id: int, new_movie: MovieIn):
 
 @app.delete("/movies/del/{movie_id}/", status_code=200)
 async def del_movie_by_id(movie_id: int):
+    if not does_movie_with_id_exist(movie_id):
+        raise HTTPException(status_code=404, detail="Movie not found")
+
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute("DELETE FROM movies WHERE id=?", (movie_id,))
