@@ -57,13 +57,19 @@ def convert_to_set_of_ids(results):
     return results_set
 
 
-def does_movie_with_id_exist(id):
+def get_set_of_existing_ids():
     with sqlite3.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute("SELECT id FROM movies")
         results = cur.fetchall()
 
     results = convert_to_set_of_ids(results)
+
+    return results
+
+
+def does_movie_with_id_exist(id):
+    results = get_set_of_existing_ids
 
     if id in results:
         return True
