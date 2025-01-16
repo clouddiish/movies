@@ -58,7 +58,7 @@ def add_movie(new_movie: MovieOut):
 
 
 @router.put("/movies/{movie_id}", status_code=200)
-def update_movie_by_id(movie_id: int, new_movie: MovieOut):
+def update_movie(movie_id: int, new_movie: MovieOut):
     """Updates a movie by its ID.
 
     Args:
