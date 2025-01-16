@@ -71,7 +71,7 @@ def update_movie(movie_id: int, new_movie: MovieOut):
     Returns:
         dict: Success message.
     """
-    if not get_movie_by_id(movie_id):
+    if not read_movie_by_id(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
     update_movie_by_id(movie_id, new_movie)
@@ -91,7 +91,7 @@ def del_movie_by_id(movie_id: int):
     Returns:
         dict: Success message.
     """
-    if not get_movie_by_id(movie_id):
+    if not read_movie_by_id(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
     delete_movie_by_id(movie_id)
