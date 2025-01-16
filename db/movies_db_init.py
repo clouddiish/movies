@@ -62,10 +62,6 @@ def create_initial_movies():
         ),
     ]
 
-    movie_1 = MovieOut(
-        title="Echoes of Time", director="Sophie Lane", category="sci-fi", year=2017
-    )
-
     with Session(engine) as session:
         for movie in initial_data:
             session.add(movie)
