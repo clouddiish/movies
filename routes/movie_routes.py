@@ -18,16 +18,10 @@ def get_all_movies():
     Returns:
         list: List of all movies in the database.
     """
-    with sqlite3.connect(DATABASE) as con:
-        cur = con.cursor()
-        cur.execute("SELECT id, title, director, category, year FROM movies")
-        results = cur.fetchall()
-
-    results = convert_results(results)
-    return results
+    return read_movies()
 
 
-@app.get("/movies/{movie_id}", response_model=MovieOut, status_code=200)
+@app.get("/movies/{movie_id}", response_model=list[MovieOut], status_code=200)
 def get_movie_by_id(movie_id: int):
     """Retrieves a specific movie by its ID.
 
@@ -38,20 +32,13 @@ def get_movie_by_id(movie_id: int):
         HTTPException: If the movie is not found.
 
     Returns:
-        dict: Movie data.
+        list: List with the movie data.
     """
-    if not does_movie_with_id_exist(movie_id):
+    result = read_movie_by_id(movie_id)
+
+    if not result:
         raise HTTPException(status_code=404, detail="Movie not found")
 
-    with sqlite3.connect(DATABASE) as con:
-        cur = con.cursor()
-        cur.execute(
-            "SELECT id, title, director, category, year FROM movies WHERE id=?",
-            (movie_id,),
-        )
-        result = cur.fetchone()
-
-    result = convert_result(result)
     return result
 
 
@@ -65,13 +52,7 @@ def add_movie(new_movie: MovieIn):
     Returns:
         dict: Success message.
     """
-    with sqlite3.connect(DATABASE) as con:
-        cur = con.cursor()
-        cur.execute(
-            "INSERT INTO movies (title, director, category, year) VALUES(?, ?, ?, ?)",
-            (new_movie.title, new_movie.director, new_movie.category, new_movie.year),
-        )
-        con.commit()
+    create_movie(new_movie)
 
     return {"message": "Movie added successfully"}
 
@@ -90,31 +71,10 @@ def update_movie_by_id(movie_id: int, new_movie: MovieIn):
     Returns:
         dict: Success message.
     """
-    if not does_movie_with_id_exist(movie_id):
+    if not get_movie_by_id(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
-    with sqlite3.connect(DATABASE) as con:
-        cur = con.cursor()
-        cur.execute(
-            """
-                UPDATE movies 
-                SET title = ?,
-                    director = ?,
-                    category = ?,
-                    year = ?
-                WHERE
-                    id = ?
-            """,
-            (
-                new_movie.title,
-                new_movie.director,
-                new_movie.category,
-                new_movie.year,
-                movie_id,
-            ),
-        )
-        con.commit()
-
+    update_movie_by_id(movie_id, new_movie)
     return {"message": "Movie updated successfully"}
 
 
@@ -131,12 +91,9 @@ def del_movie_by_id(movie_id: int):
     Returns:
         dict: Success message.
     """
-    if not does_movie_with_id_exist(movie_id):
+    if not get_movie_by_id(movie_id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
-    with sqlite3.connect(DATABASE) as con:
-        cur = con.cursor()
-        cur.execute("DELETE FROM movies WHERE id=?", (movie_id,))
-        con.commit()
+    delete_movie_by_id(movie_id)
 
     return {"message": "Movie deleted successfully"}
