@@ -40,7 +40,7 @@ def get_movie_by_id(movie_id: int):
 
 
 @router.post("/movies", status_code=201)
-def add_movie(new_movie: MovieOut):
+def add_movie(new_movie: MovieIn):
     """Adds a new movie to the database.
 
     Args:
@@ -55,7 +55,7 @@ def add_movie(new_movie: MovieOut):
 
 
 @router.put("/movies/{movie_id}", status_code=200)
-def update_movie(movie_id: int, new_movie: MovieOut):
+def update_movie(movie_id: int, new_movie: MovieIn):
     """Updates a movie by its ID.
 
     Args:

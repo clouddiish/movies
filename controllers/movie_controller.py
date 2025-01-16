@@ -20,8 +20,9 @@ def convert_results(results):
     return results_arr
 
 
-def create_movie(new_movie: MovieOut):
+def create_movie(new_movie: MovieIn):
     with Session(engine) as session:
+        new_movie = MovieOut(**dict(new_movie))
         session.add(new_movie)
         session.commit()
 
@@ -48,7 +49,7 @@ def read_movie_by_id(id: int):
         return results
 
 
-def update_movie_by_id(id: int, new_movie: MovieOut):
+def update_movie_by_id(id: int, new_movie: MovieIn):
     with Session(engine) as session:
         if not read_movie_by_id(id):
             raise HTTPException(status_code=404, detail="Movie not found")
