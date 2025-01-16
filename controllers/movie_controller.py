@@ -42,11 +42,11 @@ def read_movie_by_id(id: int):
 
 def update_movie_by_id(id: int, new_movie: MovieIn):
     with Session(engine) as session:
-        statement = select(MovieOut).where(MovieOut.id == id)
-        results = session.exec(statement)
-
         if not read_movie_by_id(id):
             return
+
+        statement = select(MovieOut).where(MovieOut.id == id)
+        results = session.exec(statement)
 
         movie = results.one()
 
@@ -56,4 +56,18 @@ def update_movie_by_id(id: int, new_movie: MovieIn):
         movie.year = new_movie.year
 
         session.add(movie)
+        session.commit()
+
+
+def delete_movie_by_id(id):
+    with Session(engine) as session:
+        if not read_movie_by_id(id):
+            return
+
+        statement = select(MovieOut).where(MovieOut.id == id)
+        results = session.exec(statement)
+
+        movie = results.one()
+
+        session.delete(movie)
         session.commit()
