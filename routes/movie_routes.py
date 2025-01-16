@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from models.movie_models import MovieIn, MovieOut
 from controllers.movie_controller import (
     create_movie,
@@ -8,10 +8,10 @@ from controllers.movie_controller import (
     delete_movie_by_id,
 )
 
-app = FastAPI()
+router = APIRouter()
 
 
-@app.get("/movies", response_model=list[MovieOut], status_code=200)
+@router.get("/movies", response_model=list[MovieOut], status_code=200)
 def get_all_movies():
     """Retrieves all movies from the database.
 
@@ -21,7 +21,7 @@ def get_all_movies():
     return read_movies()
 
 
-@app.get("/movies/{movie_id}", response_model=list[MovieOut], status_code=200)
+@router.get("/movies/{movie_id}", response_model=list[MovieOut], status_code=200)
 def get_movie_by_id(movie_id: int):
     """Retrieves a specific movie by its ID.
 
@@ -42,7 +42,7 @@ def get_movie_by_id(movie_id: int):
     return result
 
 
-@app.post("/movies", status_code=201)
+@router.post("/movies", status_code=201)
 def add_movie(new_movie: MovieIn):
     """Adds a new movie to the database.
 
@@ -57,7 +57,7 @@ def add_movie(new_movie: MovieIn):
     return {"message": "Movie added successfully"}
 
 
-@app.put("/movies/{movie_id}", status_code=200)
+@router.put("/movies/{movie_id}", status_code=200)
 def update_movie_by_id(movie_id: int, new_movie: MovieIn):
     """Updates a movie by its ID.
 
@@ -78,7 +78,7 @@ def update_movie_by_id(movie_id: int, new_movie: MovieIn):
     return {"message": "Movie updated successfully"}
 
 
-@app.delete("/movies/{movie_id}", status_code=200)
+@router.delete("/movies/{movie_id}", status_code=200)
 def del_movie_by_id(movie_id: int):
     """Deletes a movie by its ID.
 
