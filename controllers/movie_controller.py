@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlmodel import SQLModel, Session, select
 from ex6.models.movie_models import MovieIn, MovieOut
 from ex6.models.database import engine
@@ -37,13 +38,20 @@ def read_movie_by_id(id: int):
         statement = select(MovieOut).where(MovieOut.id == id)
         results = session.exec(statement)
 
-        return convert_results(results)
+        results = convert_results(results)
+
+        if not results:
+            raise HTTPException(status_code=404, detail="Movie not found")
+
+        results = results[0]
+
+        return results
 
 
 def update_movie_by_id(id: int, new_movie: MovieOut):
     with Session(engine) as session:
         if not read_movie_by_id(id):
-            return
+            raise HTTPException(status_code=404, detail="Movie not found")
 
         statement = select(MovieOut).where(MovieOut.id == id)
         results = session.exec(statement)
@@ -62,7 +70,7 @@ def update_movie_by_id(id: int, new_movie: MovieOut):
 def delete_movie_by_id(id):
     with Session(engine) as session:
         if not read_movie_by_id(id):
-            return
+            raise HTTPException(status_code=404, detail="Movie not found")
 
         statement = select(MovieOut).where(MovieOut.id == id)
         results = session.exec(statement)

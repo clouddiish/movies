@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from ex6.models.movie_models import MovieIn, MovieOut
 from ex6.controllers.movie_controller import (
     create_movie,
@@ -21,7 +21,7 @@ def get_all_movies():
     return read_movies()
 
 
-@router.get("/movies/{movie_id}", response_model=list[MovieOut], status_code=200)
+@router.get("/movies/{movie_id}", response_model=MovieOut, status_code=200)
 def get_movie_by_id(movie_id: int):
     """Retrieves a specific movie by its ID.
 
@@ -32,12 +32,9 @@ def get_movie_by_id(movie_id: int):
         HTTPException: If the movie is not found.
 
     Returns:
-        list: List with the movie data.
+        dict: movie data.
     """
     result = read_movie_by_id(movie_id)
-
-    if not result:
-        raise HTTPException(status_code=404, detail="Movie not found")
 
     return result
 
@@ -71,9 +68,6 @@ def update_movie(movie_id: int, new_movie: MovieOut):
     Returns:
         dict: Success message.
     """
-    if not read_movie_by_id(movie_id):
-        raise HTTPException(status_code=404, detail="Movie not found")
-
     update_movie_by_id(movie_id, new_movie)
     return {"message": "Movie updated successfully"}
 
@@ -91,9 +85,6 @@ def del_movie_by_id(movie_id: int):
     Returns:
         dict: Success message.
     """
-    if not read_movie_by_id(movie_id):
-        raise HTTPException(status_code=404, detail="Movie not found")
-
     delete_movie_by_id(movie_id)
 
     return {"message": "Movie deleted successfully"}
