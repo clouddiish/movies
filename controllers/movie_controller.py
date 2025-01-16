@@ -5,6 +5,14 @@ from ex6.models.database import engine
 
 
 def convert_results(results):
+    """Converts SQL query results into a list of dictionaries.
+
+    Args:
+        results (Iterable): SQL query results.
+
+    Returns:
+        list: A list of dictionaries with movie data.
+    """
     results_arr = []
 
     for row in results:
@@ -21,6 +29,11 @@ def convert_results(results):
 
 
 def create_movie(new_movie: MovieIn):
+    """Inserts a new movie into the database.
+
+    Args:
+        new_movie (MovieIn): The movie data to be inserted.
+    """
     with Session(engine) as session:
         new_movie = MovieOut(**dict(new_movie))
         session.add(new_movie)
@@ -28,6 +41,11 @@ def create_movie(new_movie: MovieIn):
 
 
 def read_movies():
+    """Retrieves all movies from the database.
+
+    Returns:
+        list: A list of all movies in dictionary format.
+    """
     with Session(engine) as session:
         statement = select(MovieOut)
         results = session.exec(statement)
@@ -35,6 +53,17 @@ def read_movies():
 
 
 def read_movie_by_id(id: int):
+    """Retrieves a specific movie by its ID.
+
+    Args:
+        id (int): The ID of the movie to retrieve.
+
+    Raises:
+        HTTPException: If the movie is not found.
+
+    Returns:
+        dict: Movie data.
+    """
     with Session(engine) as session:
         statement = select(MovieOut).where(MovieOut.id == id)
         results = session.exec(statement)
@@ -50,6 +79,15 @@ def read_movie_by_id(id: int):
 
 
 def update_movie_by_id(id: int, new_movie: MovieIn):
+    """Updates an existing movie by its ID.
+
+    Args:
+        id (int): The ID of the movie to update.
+        new_movie (MovieIn): The updated movie data.
+
+    Raises:
+        HTTPException: If the movie is not found.
+    """
     with Session(engine) as session:
         if not read_movie_by_id(id):
             raise HTTPException(status_code=404, detail="Movie not found")
@@ -69,6 +107,14 @@ def update_movie_by_id(id: int, new_movie: MovieIn):
 
 
 def delete_movie_by_id(id):
+    """Deletes a movie by its ID.
+
+    Args:
+        id (int): The ID of the movie to delete.
+
+    Raises:
+        HTTPException: If the movie is not found.
+    """
     with Session(engine) as session:
         if not read_movie_by_id(id):
             raise HTTPException(status_code=404, detail="Movie not found")
