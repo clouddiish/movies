@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from models.movie_models import MovieIn, MovieOut
-from controllers.movie_controller import (
+from ex6.models.movie_models import MovieIn, MovieOut
+from ex6.controllers.movie_controller import (
     create_movie,
     read_movies,
     read_movie_by_id,
@@ -43,7 +43,7 @@ def get_movie_by_id(movie_id: int):
 
 
 @router.post("/movies", status_code=201)
-def add_movie(new_movie: MovieIn):
+def add_movie(new_movie: MovieOut):
     """Adds a new movie to the database.
 
     Args:
@@ -58,7 +58,7 @@ def add_movie(new_movie: MovieIn):
 
 
 @router.put("/movies/{movie_id}", status_code=200)
-def update_movie_by_id(movie_id: int, new_movie: MovieIn):
+def update_movie_by_id(movie_id: int, new_movie: MovieOut):
     """Updates a movie by its ID.
 
     Args:

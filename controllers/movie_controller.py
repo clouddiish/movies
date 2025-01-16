@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Session, select
-from models.movie_models import MovieIn, MovieOut
-from models.database import engine
+from ex6.models.movie_models import MovieIn, MovieOut
+from ex6.models.database import engine
 
 
 def convert_results(results):
@@ -19,7 +19,7 @@ def convert_results(results):
     return results_arr
 
 
-def create_movie(new_movie: MovieIn):
+def create_movie(new_movie: MovieOut):
     with Session(engine) as session:
         session.add(new_movie)
         session.commit()
@@ -40,7 +40,7 @@ def read_movie_by_id(id: int):
         return convert_results(results)
 
 
-def update_movie_by_id(id: int, new_movie: MovieIn):
+def update_movie_by_id(id: int, new_movie: MovieOut):
     with Session(engine) as session:
         if not read_movie_by_id(id):
             return

@@ -1,9 +1,14 @@
-from sqlmodel import SQLModel, Session
+from sqlmodel import SQLModel, Session, delete
 from models.movie_models import MovieOut
 from models.database import engine
 
 
 def create_db_and_tables():
+    with Session(engine) as session:
+        statement = delete(MovieOut)
+        result = session.exec(statement)
+        session.commit()
+
     SQLModel.metadata.create_all(engine)
 
 
