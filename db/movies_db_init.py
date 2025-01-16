@@ -4,11 +4,7 @@ from models.database import engine
 
 
 def create_db_and_tables():
-    with Session(engine) as session:
-        statement = delete(MovieOut)
-        result = session.exec(statement)
-        session.commit()
-
+    SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
 
 
