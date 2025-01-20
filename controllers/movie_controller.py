@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 from sqlmodel import SQLModel, Session, select
 from ex6.models.movie_models import MovieIn, MovieOut
-from ex6.models.database import engine
 
 
 def convert_results(results):
@@ -28,31 +27,29 @@ def convert_results(results):
     return results_arr
 
 
-def create_movie(new_movie: MovieIn):
+def create_movie(session: Session, new_movie: MovieIn):
     """Inserts a new movie into the database.
 
     Args:
         new_movie (MovieIn): The movie data to be inserted.
     """
-    with Session(engine) as session:
-        new_movie = MovieOut(**dict(new_movie))
-        session.add(new_movie)
-        session.commit()
+    new_movie = MovieOut(**dict(new_movie))
+    session.add(new_movie)
+    session.commit()
 
 
-def read_movies():
+def read_movies(session: Session):
     """Retrieves all movies from the database.
 
     Returns:
         list: A list of all movies in dictionary format.
     """
-    with Session(engine) as session:
-        statement = select(MovieOut)
-        results = session.exec(statement)
-        return convert_results(results)
+    statement = select(MovieOut)
+    results = session.exec(statement)
+    return convert_results(results)
 
 
-def read_movie_by_id(id: int):
+def read_movie_by_id(session: Session, id: int):
     """Retrieves a specific movie by its ID.
 
     Args:
@@ -64,21 +61,20 @@ def read_movie_by_id(id: int):
     Returns:
         dict: Movie data.
     """
-    with Session(engine) as session:
-        statement = select(MovieOut).where(MovieOut.id == id)
-        results = session.exec(statement)
+    statement = select(MovieOut).where(MovieOut.id == id)
+    results = session.exec(statement)
 
-        results = convert_results(results)
+    results = convert_results(results)
 
-        if not results:
-            raise HTTPException(status_code=404, detail="Movie not found")
+    if not results:
+        raise HTTPException(status_code=404, detail="Movie not found")
 
-        results = results[0]
+    results = results[0]
 
-        return results
+    return results
 
 
-def update_movie_by_id(id: int, new_movie: MovieIn):
+def update_movie_by_id(session: Session, id: int, new_movie: MovieIn):
     """Updates an existing movie by its ID.
 
     Args:
@@ -88,25 +84,24 @@ def update_movie_by_id(id: int, new_movie: MovieIn):
     Raises:
         HTTPException: If the movie is not found.
     """
-    with Session(engine) as session:
-        if not read_movie_by_id(id):
-            raise HTTPException(status_code=404, detail="Movie not found")
+    if not read_movie_by_id(session, id):
+        raise HTTPException(status_code=404, detail="Movie not found")
 
-        statement = select(MovieOut).where(MovieOut.id == id)
-        results = session.exec(statement)
+    statement = select(MovieOut).where(MovieOut.id == id)
+    results = session.exec(statement)
 
-        movie = results.one()
+    movie = results.one()
 
-        movie.title = new_movie.title
-        movie.director = new_movie.director
-        movie.category = new_movie.category
-        movie.year = new_movie.year
+    movie.title = new_movie.title
+    movie.director = new_movie.director
+    movie.category = new_movie.category
+    movie.year = new_movie.year
 
-        session.add(movie)
-        session.commit()
+    session.add(movie)
+    session.commit()
 
 
-def delete_movie_by_id(id):
+def delete_movie_by_id(session: Session, id):
     """Deletes a movie by its ID.
 
     Args:
@@ -115,14 +110,13 @@ def delete_movie_by_id(id):
     Raises:
         HTTPException: If the movie is not found.
     """
-    with Session(engine) as session:
-        if not read_movie_by_id(id):
-            raise HTTPException(status_code=404, detail="Movie not found")
+    if not read_movie_by_id(session, id):
+        raise HTTPException(status_code=404, detail="Movie not found")
 
-        statement = select(MovieOut).where(MovieOut.id == id)
-        results = session.exec(statement)
+    statement = select(MovieOut).where(MovieOut.id == id)
+    results = session.exec(statement)
 
-        movie = results.one()
+    movie = results.one()
 
-        session.delete(movie)
-        session.commit()
+    session.delete(movie)
+    session.commit()

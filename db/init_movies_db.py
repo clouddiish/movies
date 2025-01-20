@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Session, delete
+from sqlmodel import SQLModel, Session
 from models.movie_models import MovieOut
 from models.database import engine
 
