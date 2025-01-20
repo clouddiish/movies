@@ -57,10 +57,32 @@ def client_fixture(session: Session, db_init):
     app.dependency_overrides.clear()
 
 
-def test_read_movies(client: TestClient):
+def test_get_all_movies(client: TestClient):
     response = client.get("/movies")
     assert response.status_code == 200
 
     data = response.json()
     assert isinstance(data, list)
     assert len(data) == 3
+
+
+def test_get_movie_by_id_when_existing(client: TestClient):
+    response = client.get("/movies/1")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data == {
+        "title": "Amazing Movie",
+        "director": "Anne Bee",
+        "category": "action",
+        "year": 1996,
+        "id": 1,
+    }
+
+
+def test_get_movie_by_id_when_nonexistent(client: TestClient):
+    response = client.get("/movies/100")
+    assert response.status_code == 404
+
+    data = response.json()
+    assert data == {"detail": "Movie not found"}
