@@ -4,11 +4,6 @@ from ex6.models.movie_models import MovieIn, MovieOut
 from ex6.models.database import engine
 
 
-def get_session():
-    with Session(engine) as session:
-        yield session
-
-
 def convert_results(results):
     """Converts SQL query results into a list of dictionaries.
 
@@ -33,7 +28,7 @@ def convert_results(results):
     return results_arr
 
 
-def create_movie(new_movie: MovieIn, session: Session = Depends(get_session)):
+def create_movie(session: Session, new_movie: MovieIn):
     """Inserts a new movie into the database.
 
     Args:
@@ -44,7 +39,7 @@ def create_movie(new_movie: MovieIn, session: Session = Depends(get_session)):
     session.commit()
 
 
-def read_movies(session: Session = Depends(get_session)):
+def read_movies(session: Session):
     """Retrieves all movies from the database.
 
     Returns:
@@ -55,7 +50,7 @@ def read_movies(session: Session = Depends(get_session)):
     return convert_results(results)
 
 
-def read_movie_by_id(id: int, session: Session = Depends(get_session)):
+def read_movie_by_id(session: Session, id: int):
     """Retrieves a specific movie by its ID.
 
     Args:
@@ -80,9 +75,7 @@ def read_movie_by_id(id: int, session: Session = Depends(get_session)):
     return results
 
 
-def update_movie_by_id(
-    id: int, new_movie: MovieIn, session: Session = Depends(get_session)
-):
+def update_movie_by_id(session: Session, id: int, new_movie: MovieIn):
     """Updates an existing movie by its ID.
 
     Args:
@@ -92,7 +85,7 @@ def update_movie_by_id(
     Raises:
         HTTPException: If the movie is not found.
     """
-    if not read_movie_by_id(id):
+    if not read_movie_by_id(session, id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
     statement = select(MovieOut).where(MovieOut.id == id)
@@ -109,7 +102,7 @@ def update_movie_by_id(
     session.commit()
 
 
-def delete_movie_by_id(id, session: Session = Depends(get_session)):
+def delete_movie_by_id(session: Session, id):
     """Deletes a movie by its ID.
 
     Args:
@@ -118,7 +111,7 @@ def delete_movie_by_id(id, session: Session = Depends(get_session)):
     Raises:
         HTTPException: If the movie is not found.
     """
-    if not read_movie_by_id(id):
+    if not read_movie_by_id(session, id):
         raise HTTPException(status_code=404, detail="Movie not found")
 
     statement = select(MovieOut).where(MovieOut.id == id)
