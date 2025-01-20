@@ -150,3 +150,15 @@ def test_update_movie_when_nonexistent(client: TestClient):
     )
     assert response.status_code == 404
     assert response.json() == {"detail": "Movie not found"}
+
+
+def test_del_movie_by_id_when_existing(client: TestClient):
+    response = client.delete("/movies/3")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Movie deleted successfully"}
+
+
+def test_del_movie_by_id_when_nonexistent(client: TestClient):
+    response = client.delete("/movies/300")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Movie not found"}
