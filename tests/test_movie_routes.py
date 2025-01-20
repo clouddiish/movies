@@ -69,9 +69,7 @@ def test_get_all_movies(client: TestClient):
 def test_get_movie_by_id_when_existing(client: TestClient):
     response = client.get("/movies/1")
     assert response.status_code == 200
-
-    data = response.json()
-    assert data == {
+    assert response.json() == {
         "title": "Amazing Movie",
         "director": "Anne Bee",
         "category": "action",
@@ -83,6 +81,30 @@ def test_get_movie_by_id_when_existing(client: TestClient):
 def test_get_movie_by_id_when_nonexistent(client: TestClient):
     response = client.get("/movies/100")
     assert response.status_code == 404
+    assert response.json() == {"detail": "Movie not found"}
 
-    data = response.json()
-    assert data == {"detail": "Movie not found"}
+
+def test_add_movie_when_data_ok(client: TestClient):
+    response = client.post(
+        "/movies",
+        json={
+            "title": "Test Title",
+            "director": "Test Director",
+            "category": "test category",
+            "year": 2000,
+        },
+    )
+    assert response.status_code == 201
+    assert response.json() == {"message": "Movie added successfully"}
+
+
+def test_add_movie_when_title_empty(client: TestClient):
+    response = client.post(
+        "/movies",
+        json={
+            "title": "",
+            "director": "Test Director",
+            "category": "test category",
+            "year": 2000,
+        },
+    )
