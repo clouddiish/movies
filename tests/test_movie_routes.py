@@ -108,3 +108,45 @@ def test_add_movie_when_title_empty(client: TestClient):
             "year": 2000,
         },
     )
+    assert response.status_code == 422
+
+
+def test_update_movie_when_existing(client: TestClient):
+    response = client.put(
+        "/movies/1",
+        json={
+            "title": "Test Title",
+            "director": "Test Director",
+            "category": "test category",
+            "year": 2000,
+        },
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Movie updated successfully"}
+
+
+def test_update_movie_when_title_empty(client: TestClient):
+    response = client.put(
+        "/movies/1",
+        json={
+            "title": "",
+            "director": "Test Director",
+            "category": "test category",
+            "year": 2000,
+        },
+    )
+    assert response.status_code == 422
+
+
+def test_update_movie_when_nonexistent(client: TestClient):
+    response = client.put(
+        "/movies/100",
+        json={
+            "title": "Test Title",
+            "director": "Test Director",
+            "category": "test category",
+            "year": 2000,
+        },
+    )
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Movie not found"}
