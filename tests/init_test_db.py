@@ -1,6 +1,12 @@
-from sqlmodel import SQLModel, Session, delete
-from models.movie_models import MovieOut
-from models.database import engine
+from sqlmodel import create_engine, SQLModel, Session
+from sqlmodel.pool import StaticPool
+from ex6.models.movie_models import MovieOut
+
+engine = create_engine(
+    "sqlite://",
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
 
 
 def create_db_and_tables():
