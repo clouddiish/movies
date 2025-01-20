@@ -1,7 +1,6 @@
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from sqlmodel import SQLModel, Session, select
 from ex6.models.movie_models import MovieIn, MovieOut
-from ex6.models.database import engine
 
 
 def convert_results(results):

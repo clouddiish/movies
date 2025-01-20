@@ -4,6 +4,7 @@ from sqlmodel import SQLModel, create_engine, Session
 from sqlmodel.pool import StaticPool
 from ex6.main import app
 from ex6.routes.movie_routes import get_session
+from ex6.models.movie_models import MovieOut
 
 
 @pytest.fixture(name="session")
@@ -15,11 +16,36 @@ def session_fixture():
     )
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
-        yield session
+        try:
+            session.begin()
+            yield session
+        finally:
+            session.rollback()
+            session.close()
+
+
+@pytest.fixture(name="db_init")
+def db_init_fixture(session: Session):
+    initial_data = [
+        MovieOut(
+            title="Amazing Movie", director="Anne Bee", category="action", year=1996
+        ),
+        MovieOut(
+            title="Fantastic Film", director="Cee Dee", category="sci-fi", year=2013
+        ),
+        MovieOut(
+            title="Epic Adventure", director="John Doe", category="adventure", year=2005
+        ),
+    ]
+
+    for movie in initial_data:
+        session.add(movie)
+
+    session.commit()
 
 
 @pytest.fixture(name="client")
-def client_fixture(session: Session):
+def client_fixture(session: Session, db_init):
     def get_session_override():
         return session
 
@@ -34,3 +60,7 @@ def client_fixture(session: Session):
 def test_read_movies(client: TestClient):
     response = client.get("/movies")
     assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 3
