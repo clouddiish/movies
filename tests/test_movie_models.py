@@ -43,3 +43,18 @@ def test_movie_out_inherits_movie_base():
     assert movie.director == "Test Director"
     assert movie.category == "test category"
     assert movie.year == 2010
+
+
+def test_movie_in_excludes_id():
+    movie = MovieIn(
+        title="Test Movie",
+        director="Test Director",
+        category="test category",
+        year=2010,
+    )
+
+    assert not hasattr(movie, "id")
+    assert movie.title == "Test Movie"
+    assert movie.director == "Test Director"
+    assert movie.category == "test category"
+    assert movie.year == 2010
