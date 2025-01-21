@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from ex6.models.movie_models import MovieIn, MovieOut
+from movies.models.movie_models import MovieIn, MovieOut
 from sqlmodel import Session
-from ex6.models.database import engine
-from ex6.controllers.movie_controller import (
+from movies.models.database import engine
+from movies.controllers.movie_controller import (
     create_movie,
     read_movies,
     read_movie_by_id,

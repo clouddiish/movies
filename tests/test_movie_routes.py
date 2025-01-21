@@ -2,9 +2,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import SQLModel, create_engine, Session
 from sqlmodel.pool import StaticPool
-from ex6.main import app
-from ex6.routes.movie_routes import get_session
-from ex6.models.movie_models import MovieOut
+from movies.main import app
+from movies.routes.movie_routes import get_session
+from movies.models.movie_models import MovieOut
 
 
 @pytest.fixture(name="session")

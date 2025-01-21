@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from ex6.models.movie_models import MovieBase, MovieOut, MovieIn
+from movies.models.movie_models import MovieBase, MovieOut, MovieIn
 
 
 def test_movie_base_valid():
