@@ -9,6 +9,11 @@ from ex6.models.movie_models import MovieOut
 
 @pytest.fixture(name="session")
 def session_fixture():
+    """Fixture for creating an in-memory SQLite session.
+
+    Returns:
+        Session: A SQLAlchemy session for database interactions.
+    """
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
@@ -26,6 +31,11 @@ def session_fixture():
 
 @pytest.fixture(name="db_init")
 def db_init_fixture(session: Session):
+    """Fixture to initialize the database with test data.
+
+    Args:
+        session (Session): The SQLAlchemy session for database interactions.
+    """
     initial_data = [
         MovieOut(
             title="Amazing Movie", director="Anne Bee", category="action", year=1996
@@ -46,6 +56,16 @@ def db_init_fixture(session: Session):
 
 @pytest.fixture(name="client")
 def client_fixture(session: Session, db_init):
+    """Fixture for creating a FastAPI test client with overridden dependencies.
+
+    Args:
+        session (Session): The SQLAlchemy session for database interactions.
+        db_init (None): Ensures the database is initialized before the client is created.
+
+    Returns:
+        TestClient: A test client for FastAPI endpoints.
+    """
+
     def get_session_override():
         return session
 
@@ -58,6 +78,11 @@ def client_fixture(session: Session, db_init):
 
 
 def test_get_all_movies(client: TestClient):
+    """Test retrieving all movies from the database.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.get("/movies")
     assert response.status_code == 200
 
@@ -67,6 +92,11 @@ def test_get_all_movies(client: TestClient):
 
 
 def test_get_movie_by_id_when_existing(client: TestClient):
+    """Test retrieving a movie by its ID when it exists.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.get("/movies/1")
     assert response.status_code == 200
     assert response.json() == {
@@ -79,12 +109,22 @@ def test_get_movie_by_id_when_existing(client: TestClient):
 
 
 def test_get_movie_by_id_when_nonexistent(client: TestClient):
+    """Test retrieving a movie by its ID when it does not exist.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.get("/movies/100")
     assert response.status_code == 404
     assert response.json() == {"detail": "Movie not found"}
 
 
 def test_add_movie_when_data_ok(client: TestClient):
+    """Test adding a movie with valid data.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.post(
         "/movies",
         json={
@@ -99,6 +139,11 @@ def test_add_movie_when_data_ok(client: TestClient):
 
 
 def test_add_movie_when_title_empty(client: TestClient):
+    """Test adding a movie with an empty title.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.post(
         "/movies",
         json={
@@ -112,6 +157,11 @@ def test_add_movie_when_title_empty(client: TestClient):
 
 
 def test_update_movie_when_existing(client: TestClient):
+    """Test updating an existing movie with valid data.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.put(
         "/movies/1",
         json={
@@ -126,6 +176,11 @@ def test_update_movie_when_existing(client: TestClient):
 
 
 def test_update_movie_when_title_empty(client: TestClient):
+    """Test updating a movie with an empty title.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.put(
         "/movies/1",
         json={
@@ -139,6 +194,11 @@ def test_update_movie_when_title_empty(client: TestClient):
 
 
 def test_update_movie_when_nonexistent(client: TestClient):
+    """Test updating a non-existent movie.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.put(
         "/movies/100",
         json={
@@ -153,12 +213,22 @@ def test_update_movie_when_nonexistent(client: TestClient):
 
 
 def test_del_movie_by_id_when_existing(client: TestClient):
+    """Test deleting a movie by its ID when it exists.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.delete("/movies/3")
     assert response.status_code == 200
     assert response.json() == {"message": "Movie deleted successfully"}
 
 
 def test_del_movie_by_id_when_nonexistent(client: TestClient):
+    """Test deleting a movie by its ID when it does not exist.
+
+    Args:
+        client (TestClient): The FastAPI test client.
+    """
     response = client.delete("/movies/300")
     assert response.status_code == 404
     assert response.json() == {"detail": "Movie not found"}
