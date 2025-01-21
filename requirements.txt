@@ -2,3 +2,4 @@ fastapi
 sqlmodel
 pydantic
 pytest
+httpx
