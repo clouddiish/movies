@@ -27,3 +27,19 @@ def test_movie_base_empty_title():
         )
 
     assert "String should have at least 1 character" in str(err.value)
+
+
+def test_movie_out_inherits_movie_base():
+    movie = MovieOut(
+        id=1,
+        title="Test Movie",
+        director="Test Director",
+        category="test category",
+        year=2010,
+    )
+
+    assert movie.id == 1
+    assert movie.title == "Test Movie"
+    assert movie.director == "Test Director"
+    assert movie.category == "test category"
+    assert movie.year == 2010
