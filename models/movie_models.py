@@ -11,10 +11,10 @@ class MovieBase(SQLModel):
         year (int): Year the movie was released.
     """
 
-    title: str = Field(min_length=1, description="The title cannot be empty")
-    director: str = Field(min_length=1, description="The director cannot be empty")
-    category: str = Field(min_length=1, description="The category cannot be empty")
-    year: int = Field(gt=0, description="The year must be a positive integer")
+    title: str = Field(min_length=1)
+    director: str = Field(min_length=1)
+    category: str = Field(min_length=1)
+    year: int = Field(gt=0)
 
 
 class MovieOut(MovieBase, table=True):
