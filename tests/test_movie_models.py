@@ -16,7 +16,7 @@ def test_movie_base_valid():
         year=2010,
     )
 
-    assert movie.title == "Test Movie"
+    assert movie.title == "Test Movvie"
     assert movie.director == "Test Director"
     assert movie.category == "test category"
     assert movie.year == 2010
